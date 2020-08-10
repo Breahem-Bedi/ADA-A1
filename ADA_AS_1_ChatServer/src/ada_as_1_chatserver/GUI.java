@@ -6,6 +6,8 @@
 package ada_as_1_chatserver;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
@@ -13,8 +15,10 @@ import javax.swing.JOptionPane;
  * @author Bedi
  */
 public class GUI extends javax.swing.JFrame {
+
     private Client client;
     private String clients[];
+
     /**
      * Creates new form GUI
      */
@@ -22,32 +26,64 @@ public class GUI extends javax.swing.JFrame {
         initComponents();
         this.client = client;
         this.client.setgui(this);
-        
-        this.client.getClientName();
+
+        client.getClientNameGUI();
         getUserName();
-        
+        getIPAddress();
+
+        client.startClient();
     }
-    
-    public String getUserName()
-    {
-        
-        String username = "";         
-        while(username != null && username.length() == 0)
-        {
-             username = (JOptionPane.showInputDialog(null,
+
+    public String getUserName() {
+
+        String username = "";
+        while (username != null && username.length() == 0) {
+            username = (JOptionPane.showInputDialog(null,
                     "Enter your username:",
                     "Username", JOptionPane.OK_CANCEL_OPTION));
         }
         if (username == null) {
             System.exit(0);
         }
-        this.client.setClientName(username); 
-         //boolean valid = false;
+        this.client.setClientName(username);
+        //boolean valid = false;
 
-
-        
         return username;
-             
+
+    }
+
+    public void updateOnlineClients(String rec) {
+        clients = rec.split("_");
+        client_list.setListData(clients);
+    }
+
+    public String getIPAddress() {
+        String input;
+        String[] options = {"localhost", "192.168.1.72", "DESKTOP-9UO9SO7", "other"};
+        do {
+            input = (String) (JOptionPane.showInputDialog(null,
+                    "Enter IP address to connect to:",
+                    "IPAddress", JOptionPane.QUESTION_MESSAGE, null, options, options[0]));
+
+        } while ((input != null || input != "other") && input.length() == 0);
+
+        // Cancel option selected
+        if (input == null) {
+            System.exit(0);
+        } else if (input == "other") {
+            do {
+                input = (JOptionPane.showInputDialog(null,
+                        "Enter IP address to connect to:",
+                        "Other IPAdress", JOptionPane.PLAIN_MESSAGE));
+            } while (input != null && input.length() == 0);
+        }
+        this.client.setIPAddress(input);
+
+        return input;
+    }
+
+    public void append(String s) {
+        messagebox.append(s);
     }
 
     /**
@@ -60,26 +96,23 @@ public class GUI extends javax.swing.JFrame {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        chatbox = new javax.swing.JTextArea();
-        messagebox = new javax.swing.JTextField();
+        messagebox = new javax.swing.JTextArea();
+        message = new javax.swing.JTextField();
         jScrollPane2 = new javax.swing.JScrollPane();
         client_list = new javax.swing.JList<>();
         private_btn = new javax.swing.JButton();
         sendall_btn = new javax.swing.JButton();
         disconnect_btn = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        chatbox.setColumns(20);
-        chatbox.setRows(5);
-        jScrollPane1.setViewportView(chatbox);
+        messagebox.setEditable(false);
+        messagebox.setColumns(20);
+        messagebox.setRows(5);
+        jScrollPane1.setViewportView(messagebox);
 
         client_list.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        client_list.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Online Clients" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
         jScrollPane2.setViewportView(client_list);
 
         private_btn.setText("Private Chat");
@@ -98,29 +131,38 @@ public class GUI extends javax.swing.JFrame {
             }
         });
 
+        jLabel1.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
+        jLabel1.setText("Online");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(71, 71, 71)
+                .addGap(29, 29, 29)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(messagebox)
+                    .addComponent(message)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 372, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(disconnect_btn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(private_btn)
+                        .addComponent(sendall_btn)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(sendall_btn))
-                    .addComponent(jScrollPane2)
-                    .addComponent(disconnect_btn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(private_btn))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(35, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel1)
+                .addGap(95, 95, 95))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(49, 49, 49)
+                .addGap(36, 36, 36)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jScrollPane2)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 316, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -128,12 +170,12 @@ public class GUI extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(private_btn)
-                            .addComponent(sendall_btn))
+                            .addComponent(sendall_btn)
+                            .addComponent(private_btn))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(disconnect_btn))
-                    .addComponent(messagebox))
-                .addContainerGap(76, Short.MAX_VALUE))
+                    .addComponent(message, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(26, Short.MAX_VALUE))
         );
 
         disconnect_btn.getAccessibleContext().setAccessibleName("DisconnectBtn");
@@ -142,12 +184,19 @@ public class GUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void sendall_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sendall_btnActionPerformed
-        // TODO add your handling code here:
+        try {
+            // TODO add your handling code here:
+            client.sendMessage(new Broadcaster(client.getClientNameGUI() + "(ALL): " + message.getText() + "\n"));
+            message.setText("");
+        } catch (IOException ex) {
+            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }//GEN-LAST:event_sendall_btnActionPerformed
 
     private void disconnect_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_disconnect_btnActionPerformed
         // TODO add your handling code here:
-        System.out.println(client.getClientName() + " User Quit");
+        System.out.println(client.getClientNameGUI() + " User Quit");
         System.exit(0);
     }//GEN-LAST:event_disconnect_btnActionPerformed
 
@@ -187,13 +236,15 @@ public class GUI extends javax.swing.JFrame {
 //    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTextArea chatbox;
     private javax.swing.JList<String> client_list;
     private javax.swing.JButton disconnect_btn;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTextField messagebox;
+    private javax.swing.JTextField message;
+    private javax.swing.JTextArea messagebox;
     private javax.swing.JButton private_btn;
     private javax.swing.JButton sendall_btn;
     // End of variables declaration//GEN-END:variables
+
 }

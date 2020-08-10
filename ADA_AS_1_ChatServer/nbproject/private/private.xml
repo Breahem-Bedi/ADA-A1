@@ -5,6 +5,8 @@
         <group>
             <file>file:/C:/Users/Bedi/Documents/NetBeansProjects/ADA_AS_1_ChatServer/src/ada_as_1_chatserver/GUI.java</file>
             <file>file:/C:/Users/Bedi/Documents/NetBeansProjects/ADA_AS_1_ChatServer/src/ada_as_1_chatserver/Server.java</file>
+            <file>file:/C:/Users/Bedi/Documents/NetBeansProjects/ADA_AS_1_ChatServer/src/ada_as_1_chatserver/Message.java</file>
+            <file>file:/C:/Users/Bedi/Documents/NetBeansProjects/ADA_AS_1_ChatServer/src/ada_as_1_chatserver/Broadcaster.java</file>
             <file>file:/C:/Users/Bedi/Documents/NetBeansProjects/ADA_AS_1_ChatServer/src/ada_as_1_chatserver/Client.java</file>
         </group>
     </open-files>
